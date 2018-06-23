@@ -1,0 +1,185 @@
+<html>
+<head>
+	<title>Boku</title>
+	<script src="jquery-3.3.1.min.js"></script>
+	<script>
+		function get_coordinates(column,line){
+			x0 = 10;
+			y0 = 60;
+
+			w = 16.5;
+			h = 19.5;
+
+			incl = 10;
+
+    		x = (column)*w + x0;
+    		if (column<=5)
+        		y = line*h - incl*column + y0;
+    		else{
+        		y0 = h - incl*5 + y0;
+        		y = y0 + line*h -h - incl*(5-column);
+    		}
+         	return [x,y]
+		}
+
+		function pieceClicked(id){
+			player = parseInt($("#jogador").text());
+			s = id.split("_");
+			coluna = parseInt(s[1]);
+			linha = parseInt(s[2]);
+			$.ajax({
+			  url: "/move?player="+player+"&coluna="+coluna+"&linha="+linha,
+			  success: function( result ) {
+			  	$("#estado").html(result);
+			  }
+			});
+			atualiza();
+		}
+
+		function circle(posx,posy,color){
+		    var canvas = document.getElementById("canvas");
+		    var context = canvas.getContext("2d");
+
+		    context.fillStyle = color;
+		    context.beginPath();
+		    context.arc(posx, posy, 5, 0, 2 * Math.PI);
+		    context.fill();			
+		}
+
+		function circle_div(posx,posy,color,id){
+			c = $("#circle").clone();
+			c.css({top: posy, left: posx, position:'absolute', background:color, visibility: 'visible'});
+			c.attr('id',id);
+
+			c.on( "click", function() {
+  				pieceClicked(id);
+			});			
+
+			c.appendTo('#tabuleiro');
+		}
+
+		function print_board(board){
+		    var canvas = document.getElementById("canvas");
+		    var context = canvas.getContext("2d");
+			var img = document.getElementById("board");
+			context.drawImage(img, 0, 0);
+
+		    for(column=0;column<board.length;column++)
+		        for(line=0;line<board[column].length;line++){
+		            coords = get_coordinates(column,line);
+		            if (board[column][line] == 0)
+		                color = 'white';
+		            else
+		            	if (board[column][line] == 1)
+		                	color = 'red';
+		            	else
+		                	color = 'green';
+		             c = column+1;
+		             l = line+1;
+		            circle_div(105+coords[0],45+coords[1],color,'c_'+c.toString()+"_"+l.toString());
+		        }  		        
+		}
+
+		board = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
+
+		function atualiza_board(){
+			$.ajax({
+			  url: "/tabuleiro",
+			  success: function( result ) {
+			    board = eval(result);
+			    print_board(board);
+			  }
+			});
+
+
+		}
+
+		function atualiza_turno(){
+			$.ajax({
+			  url: "/jogador",
+			  success: function( result ) {
+			    $("#jogador").html(result);
+			  }
+			});			
+		}
+
+		function atualiza_movimentos(){
+			$.ajax({
+			  url: "/num_movimentos",
+			  success: function( result ) {
+			    $("#movimentos").html(result);
+			  }
+			});			
+		}	
+
+		function atualiza_ultima_jogada(){
+			$.ajax({
+			  url: "/ultima_jogada",
+			  success: function( result ) {
+			    $("#ultima_jogada").html(result);
+			  }
+			});			
+		}	
+
+		function atualiza(){
+			atualiza_board();
+			atualiza_turno();
+			atualiza_movimentos();
+			atualiza_ultima_jogada();
+		}
+
+		function reiniciar(){
+			$.ajax({
+			  url: "/reiniciar",
+			  success: function( result ) {
+			    atualiza();
+			  }
+			});				
+		}
+
+	</script>
+</head>
+<body>
+
+	<div style="margin-top:50px;margin-left:50px">
+		<div id="tabuleiro" style="margin-left:50px">
+			<div id="circle" style="border-radius: 50%; width:8; height:8; border:1px solid black;position:absolute;visibility: hidden"></div>
+			<canvas id="canvas" width="200" height="200"></canvas>
+		</div>
+
+		<div style="width:300px;margin-top:50px">
+			<table border="1">
+				<thead>
+					<tr>
+						<td><strong>Turno</strong></td>
+						<td><span id="jogador">1</span></td>
+					</tr>
+					<tr>
+						<td><strong>Status</strong></td>
+						<td><span id="estado">Aguardando movimento</span></td>
+					</tr>
+					<tr>
+						<td><strong>Numero de movimentos</strong></td>
+						<td><span id="movimentos">0</span></td>
+					</tr>
+					<tr>
+						<td><strong>Ultima jogada</strong></td>
+						<td><span id="ultima_jogada">()</span></td>
+					</tr>
+
+				</thead>
+			</table>
+			<input type="button" value="Atualizar" style="margin-top:20px" onClick="atualiza();">
+			<input type="button" value="Reiniciar" style="margin-top:20px" onClick="reiniciar();">
+		</div>
+		<img src="board.png" id="board" style="visibility: hidden">
+	</div>
+
+
+
+</body>
+
+<script>
+	print_board(board);
+</script>
+</html>
