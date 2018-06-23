@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from matplotlib.patches import Circle
 import copy
-
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib 
 
