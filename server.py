@@ -301,7 +301,8 @@ class Game:
             for column in range(len(self.board)):
                 for line in range(len(self.board[column])):
                     if self.board[column][line]==0:
-                        l.append((column+1,line+1))                    
+                        if (column+1,line+1) != self.forbidden_moves:
+                            l.append((column+1,line+1))                    
             return l
 
     def get_available_boards(self):
@@ -323,16 +324,16 @@ class Game:
             return (-1,"Game is over")
         
         if player!=self.player:
-            return (-1,"Not your turn")
+            return (-2,"Not your turn")
         
         if column>len(self.board) or column<0:
-            return (-1,"No such column")
+            return (-3,"No such column")
 
         if line<0 or line>len(self.board[column-1]):
-            return (-1,"No such line in column %d" % column)
+            return (-4,"No such line in column %d" % column)
         
         if (column,line) == self.forbidden_moves:
-            return (-1, "Position not available")
+            return (-5, "Position (%d,%d) not available (forbidden)" % (column,line))
         
         if self.get_position(column,line)==0 or self.waiting_removal:
             forbidden_just_set = False
@@ -343,14 +344,14 @@ class Game:
                     self.forbidden_moves = (column,line)
                     forbidden_just_set = True
                 else:
-                    return (-1, "Invalid removal")
+                    return (-6, "Invalid removal")
             else:
                 state = player
             self.board = self.set_position(column,line,state)
             if not forbidden_just_set:
                 self.forbidden_moves = None
         else:
-            return (-1,"Position not available")
+            return (-7, "Position (%d,%d) not available" % (column,line))
         
         f = self.is_final_state()
         if f != None:
@@ -418,7 +419,10 @@ class myHandler(BaseHTTPRequestHandler):
             return
 
         if action=="jogador":
-            self.display(str(game.player))
+            if game.ended:
+                self.display("0") 
+            else:
+                self.display(str(game.player))
             return
 
         if action=="tabuleiro":
