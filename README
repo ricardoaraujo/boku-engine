@@ -1,1 +1,0 @@
-A basic engine for the table game Boku (Bollox), written in Python 3. This version is all contained in a single Jupyter Notebook, but the PNG board file is required to plot the board state.
