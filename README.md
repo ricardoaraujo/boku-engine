@@ -1,4 +1,4 @@
-Um motor, servidor e visualizador para jogar Boku feito em Python 3.
+Um motor, servidor, cliente e visualizador para jogar Boku feito em Python 3.
 
 Nota: o Jupyter Notebook está deprecado.
 
