@@ -3,6 +3,10 @@
 import copy
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib 
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__, static_url_path='/static')
 
 def get_coordinates(column,line):
     x0 = 10
@@ -384,110 +388,58 @@ class Game:
 game = Game()
 game.init_board()
 
-class myHandler(BaseHTTPRequestHandler):
-    # Handler for the GET requests
-    def display(self,message,content_type='text/plain'):
-        self.send_response(200)        
-        self.send_header('Content-type',content_type)
-        self.end_headers()
-        if isinstance(message, str):
-            self.wfile.write(bytes(message, "utf-8"))
-        else:
-            self.wfile.write(message)
 
-    def do_GET(self):
-        print   ('Get request received')
+@app.route("/minhavez")
+def minhavez():
+    player = int(q['player'][0])
+    if game.player!=player:
+        return "-1"
+    else:
+        return "1"
+    return
 
-        action = ""
-        q = ""
+@app.route("/jogador")
+def jogador():
+    if game.ended:
+        return "0"
+    else:
+        return str(game.player)
 
-        if "/" in self.path:
-            action = self.path.split("/")[1]
-            if "?" in action:
-                s  = action.split("?")
-                action = s[0]
-                q = urllib.parse.parse_qs(s[1])
+@app.route("/tabuleiro")
+def tabuleiro():
+    return str(game.board)
 
-        print(action)
+@app.route("/movimentos")
+def movimentos():
+    return str(game.get_available_moves())
 
-        if action=="minhavez":
-            player = int(q['player'][0])
-            if game.player!=player:
-                self.display("-1")
-            else:
-                self.display("1")
-            return
+@app.route("/num_movimentos")
+def num_movimentos():
+    return str(game.movements)
 
-        if action=="jogador":
-            if game.ended:
-                self.display("0") 
-            else:
-                self.display(str(game.player))
-            return
+@app.route("/ultima_jogada")
+def ultima_jogada():
+    return str((game.last_column,game.last_line))
 
-        if action=="tabuleiro":
-            self.display(str(game.board))
-            return
+@app.route("/reiniciar")
+def reiniciar():
+    game.init_board()
+    return "reiniciado"
 
-        if action=="movimentos":
-            self.display(str(game.get_available_moves()))
-            return
+@app.route("/move")
+def move():
+    coluna = int(request.args.get('coluna'))
+    linha = int(request.args.get('linha'))
+    player = int(request.args.get('player'))
+    r = game.make_move(player,coluna,linha)
+    return str(r)
 
-        if action=="num_movimentos":
-            self.display(str(game.movements))
-            return    
-
-        if action=="ultima_jogada":
-            self.display(str((game.last_column,game.last_line)))
-            return
-
-        if action=="reiniciar":
-            game.init_board()
-            self.display("reiniciado")
-            return
-
-        if action=="move":
-            coluna = int(q['coluna'][0])
-            linha = int(q['linha'][0])
-            player = int(q['player'][0])
-            r = game.make_move(player,coluna,linha)
-            self.display(str(r))
-            return
-
-        if action!="":
-            try:
-                filetype = action.split(".")[-1]
-            except:
-                filetype=""
-
-            if filetype=='png':
-                filecontent = open(action,"rb").read()
-                self.display(filecontent,'image/png')
-            elif filetype=='html' or filetype=='js':
-                filecontent = open(action,"r").read()
-                self.display(filecontent,'text/html')
-            else:
-                try:
-                    filecontent = open(action,"r").read()
-                    self.display(filecontent,'text/plain')
-                except:
-                    pass
+@app.route("/")
+def index():
+    return render_template('visualizador.html')
 
 
-        return
+PORT_NUMBER = 5000
 
-
-PORT_NUMBER = 8080
-
-try:
-    # Create a web server and define the handler to manage the
-    # incoming request
-    server = HTTPServer(('', PORT_NUMBER), myHandler)
-    print ('Started httpserver on port ' , PORT_NUMBER)
-
-    # Wait forever for incoming http requests
-    server.serve_forever()
-
-except KeyboardInterrupt:
-    print ('^C received, shutting down the web server')
-    server.socket.close()
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=PORT_NUMBER)
