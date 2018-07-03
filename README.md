@@ -4,6 +4,11 @@ Nota: o Jupyter Notebook está deprecado.
 
 ## Requerimentos
 * Python 3
+* Flask
+* Flask-SocketIO
+
+## Instalando Requisitos
+pip install -r requirements.txt
 
 ## Executando
 
