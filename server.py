@@ -439,7 +439,7 @@ def movimentos():
     if request.args.get('format') == "json":
         return jsonify(game.get_available_moves())
     else:
-        return str(game.board)
+        return str(game.get_available_moves())
 
 
 @app.route("/num_movimentos")

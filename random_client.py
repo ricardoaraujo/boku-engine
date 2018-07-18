@@ -8,7 +8,7 @@ if len(sys.argv)==1:
     quit()
 
 # Alterar se utilizar outro host
-host = "http://localhost:5000"
+host = "http://localhost:8080"
 
 player = int(sys.argv[1])
 
