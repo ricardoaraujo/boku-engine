@@ -1,8 +1,22 @@
 <html>
 <head>
 	<title>Boku</title>
-	<script src="jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/socket.io.min.js"></script>
+
 	<script>
+
+		$(document).ready(function () {
+			//connect to the socket server.
+			var socket = io.connect('http://' + document.domain + ':' + location.port + '/socket');
+
+			//receive update signal from server
+			socket.on('update', function (msg) {
+				//update board
+ 				atualiza();
+			});
+		});
+
 		function get_coordinates(column,line){
 			x0 = 10;
 			y0 = 60;
@@ -172,7 +186,7 @@
 			<input type="button" value="Atualizar" style="margin-top:20px" onClick="atualiza();">
 			<input type="button" value="Reiniciar" style="margin-top:20px" onClick="reiniciar();">
 		</div>
-		<img src="board.png" id="board" style="visibility: hidden">
+		<img src="/static/images/board.png" id="board" style="visibility: hidden">
 	</div>
 
 
