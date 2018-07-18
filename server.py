@@ -143,6 +143,7 @@ class Game:
     # Returns (player,[positions]), where [positions] is a list of the two possibilities to be removed
     def can_remove(self, player):
         removals = []
+<<<<<<< HEAD
 
         # test vertical
         s = ""
@@ -150,12 +151,38 @@ class Game:
         for line in range(max(self.last_line - 3, 1), min(self.last_line + 3, len(self.board[self.last_column - 1])) + 1):
             state = self.board[self.last_column - 1][line - 1]
             l.append((self.last_column, line))
-            s += str(state)
+=======
+        l = []
 
+        #test vertical
+        
+        #test upward
+        s = ""
+        for line in range(max(self.last_line-3,1), self.last_line+1):
+            state = self.board[self.last_column-1][line-1]
+>>>>>>> upstream/master
+            s += str(state)
+        
+        if ("1221" in s and player==1) or ("2112" in s and player==2):
+            removals.append([(self.last_column,self.last_line-1),(self.last_column,self.last_line-2)])
+
+<<<<<<< HEAD
             if "1221" in s and player == 1:
                 removals.append(l[-3:-1])
             if "2112" in s and player == 2:
                 removals.append(l[-3:-1])
+=======
+        #test downward
+        s = ""
+        for line in range(self.last_line,  min(self.last_line+3,len(self.board[self.last_column-1]))+1):
+        
+            state = self.board[self.last_column-1][line-1]
+            s += str(state)
+        
+        if ("1221" in s and player==1) or ("2112" in s and player==2):
+            removals.append([(self.last_column,self.last_line+1),(self.last_column,self.last_line+2)])
+                 
+>>>>>>> upstream/master
 
         # test upward diagonals
         diags = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5),
