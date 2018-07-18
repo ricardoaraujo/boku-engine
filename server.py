@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import copy
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, static_url_path='/static')
@@ -400,52 +400,72 @@ game.init_board()
 @app.route("/minhavez")
 def minhavez():
     player = int(q['player'][0])
-
-    if game.player != player:
-        return "-1"
+    
+    if request.args.get('format') == "json":
+        if game.player != player:
+            return jsonify("-1")
+        else:
+            return jsonify("1")
     else:
-        return "1"
-    return
-
-
+        if game.player != player:
+            return "-1"
+        else:
+            return "1"
+    
 @app.route("/jogador")
 def jogador():
-
-    if game.ended:
-        return "0"
+    if request.args.get('format') == "json":
+        if game.ended:
+            return jsonify("0")
+        else:
+            return jsonify(game.player)
     else:
-        return str(game.player)
+        if game.ended:
+            return "0"
+        else:
+            return str(game.player)
 
 
 @app.route("/tabuleiro")
 def tabuleiro():
-
-    return str(game.board)
-
+    if request.args.get('format') == "json":
+        return jsonify(game.board)
+    else:
+        return str(game.board)
+        
 
 @app.route("/movimentos")
 def movimentos():
-
-    return str(game.get_available_moves())
+    if request.args.get('format') == "json":
+        return jsonify(game.get_available_moves())
+    else:
+        return str(game.board)
 
 
 @app.route("/num_movimentos")
 def num_movimentos():
-
-    return str(game.movements)
+    if request.args.get('format') == "json":
+        return jsonify(game.movements)
+    else:
+        return str(game.movements)
 
 
 @app.route("/ultima_jogada")
 def ultima_jogada():
-
-    return str((game.last_column, game.last_line))
+    if request.args.get('format') == "json":
+        return jsonify((game.last_column, game.last_line))
+    else:
+        return str((game.last_column, game.last_line))
 
 
 @app.route("/reiniciar")
 def reiniciar():
     game.init_board()
 
-    return "reiniciado"
+    if request.args.get('format') == "json":
+        return jsonify("reiniciado")
+    else:
+        return "reiniciado"
 
 
 @app.route("/move")
@@ -456,7 +476,10 @@ def move():
     r = game.make_move(player, coluna, linha)
     socketio.emit('update', namespace='/socket')
 
-    return str(r)
+    if request.args.get('format') == "json":
+        return jsonify(r)
+    else:
+        return str(r)
 
 
 @app.route("/")
@@ -471,7 +494,7 @@ def socketConnected():
     print('Client connected')
 
 
-PORT_NUMBER = 5000
+PORT_NUMBER = 8080
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=PORT_NUMBER)
