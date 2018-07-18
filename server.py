@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import copy
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import urllib
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
