@@ -143,10 +143,6 @@ class Game:
     # Returns (player,[positions]), where [positions] is a list of the two possibilities to be removed
     def can_remove(self, player):
         removals = []
-<<<<<<< HEAD
-=======
-
->>>>>>> 7c2f4bae2bf125d7b9e2273e63c50612268b77ac
         l = []
 
         #test vertical
@@ -156,10 +152,6 @@ class Game:
         for line in range(max(self.last_line-3,1), self.last_line+1):
           
             state = self.board[self.last_column-1][line-1]
-<<<<<<< HEAD
-=======
-
->>>>>>> 7c2f4bae2bf125d7b9e2273e63c50612268b77ac
             s += str(state)
         
         if ("1221" in s and player==1) or ("2112" in s and player==2):
