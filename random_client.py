@@ -12,6 +12,9 @@ host = "http://localhost:8080"
 
 player = int(sys.argv[1])
 
+# Reinicia o tabuleiro
+resp = urllib.request.urlopen("%s/reiniciar" % host)
+
 done = False
 while not done:
     # Pergunta quem eh o jogador
